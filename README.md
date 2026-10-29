@@ -152,6 +152,8 @@ To retrain the vectorizer and dual-model ensemble on `data/fake_jobs.csv`:
 python model/train_model.py
 ```
 
+Set a stable, randomly generated `SECRET_KEY` environment variable for deployed or multi-worker installations so sessions remain valid across restarts and workers. Local development falls back to a new random key on each start.
+
 ### 5. Launch the Web Application
 ```bash
 python app.py
@@ -165,7 +167,12 @@ http://127.0.0.1:5000/
 
 ## 🧪 Testing
 
-To run the XAI feature attribution unit test:
+To run the PDF upload regression tests (unique upload paths, temporary-file cleanup, and PDF handle closure):
+```bash
+python -m unittest discover -s tests -v
+```
+
+To run the XAI feature attribution smoke test:
 ```bash
 python test.py
 ```

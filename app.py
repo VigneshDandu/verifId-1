@@ -8,7 +8,7 @@ import json
 from model.predict import predict
 from explainability.shap_explainer import get_top_shap_words
 from utils.scraper import scrape_job_url
-from utils.pdf_parser import extract_text_from_pdf, save_uploaded_pdf
+from utils.pdf_parser import process_uploaded_pdf
 from utils.contact_checker import check_contact_info
 from utils.keyword_analyzer import analyze_keywords
 from utils.job_validator import is_job_posting
@@ -18,7 +18,7 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, "templates"),
     static_folder=os.path.join(BASE_DIR, "static")
 )
-app.secret_key = "fjd_secret_2024"
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(32)
 app.config["UPLOAD_FOLDER"]      = os.path.join(BASE_DIR, "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
@@ -50,8 +50,7 @@ def analyze():
             return render_template("index.html", error="No PDF file selected.")
         if not allowed_file(file.filename):
             return render_template("index.html", error="Only PDF files are accepted.")
-        save_path  = save_uploaded_pdf(file, app.config["UPLOAD_FOLDER"])
-        pdf_result = extract_text_from_pdf(save_path)
+        pdf_result = process_uploaded_pdf(file, app.config["UPLOAD_FOLDER"])
         if not pdf_result["success"]:
             return render_template("index.html", error=pdf_result["error"])
         text   = pdf_result["text"]
